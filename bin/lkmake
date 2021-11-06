@@ -13,7 +13,7 @@ fi
 
 if [ -z "${MAC_LINUX_KDK_PATH}" ]
 then
-  export MAC_LINUX_KDK_PATH="${HOMEBREW_ROOT}/opt/mac-linux-kdk"
+  export MAC_LINUX_KDK_PATH="${HOMEBREW_ROOT}/opt/mac-linux-kdk/libexec"
 fi
 
 export PATH="${HOMEBREW_ROOT}/opt/llvm/bin:${PATH}"
