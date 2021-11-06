@@ -1,0 +1,32 @@
+#!/bin/sh
+set -e
+
+if [ -z "${HOMEBREW_ROOT}" ]
+then
+  if [ -d "/opt/homebrew" ]
+  then
+    HOMEBREW_ROOT="/opt/homebrew"
+  else
+    HOMEBREW_ROOT="/usr/local"
+  fi
+fi
+
+if [ -z "${MAC_LINUX_KDK_PATH}" ]
+then
+  export MAC_LINUX_KDK_PATH="${HOMEBREW_PREFIX}/opt/mac-linux-kdk"
+fi
+
+export PATH="${HOMEBREW_ROOT}/opt/llvm/bin:${PATH}"
+
+NCURSES_PKGCONFIG_PATH="${HOMEBREW_ROOT}/opt/ncurses/lib/pkgconfig"
+if [ -n "${PKG_CONFIG_PATH}" ]
+then
+  export PKG_CONFIG_PATH="${NCURSES_PKGCONFIG_PATH}:${PKG_CONFIG_PATH}"
+else
+  export PKG_CONFIG_PATH="${NCURSES_PKGCONFIG_PATH}"
+fi
+
+exec make LLVM=1 \
+  HOSTCFLAGS="-D_UUID_T -D__GETHOSTUUID_H -I${MAC_LINUX_KDK_PATH}/env/include -I${HOMEBREW_ROOT}/opt/openssl@1.1/include" \
+  HOSTLDFLAGS="-L${HOMEBREW_ROOT}/opt/openssl@1.1/lib" \
+  "${@}"
