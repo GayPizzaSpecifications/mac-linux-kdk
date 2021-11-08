@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 if [ -z "${HOMEBREW_ROOT}" ]
@@ -16,7 +16,13 @@ then
   export MAC_LINUX_KDK_PATH="${HOMEBREW_ROOT}/opt/mac-linux-kdk/libexec"
 fi
 
-export PATH="${HOMEBREW_ROOT}/opt/llvm/bin:${PATH}"
+_get_gnu_bin() {
+  echo -n "$(find -L "${DF_HOMEBREW_ROOT}/opt" -maxdepth 3 -type d -name gnubin)" | tr '\n' ':'
+}
+
+GNU_BIN_PATH="$(_get_gnu_bin)"
+
+export PATH="${HOMEBREW_ROOT}/opt/llvm/bin:${GNU_BIN_PATH}:${PATH}"
 
 NCURSES_PKGCONFIG_PATH="${HOMEBREW_ROOT}/opt/ncurses/lib/pkgconfig"
 if [ -n "${PKG_CONFIG_PATH}" ]
@@ -26,7 +32,24 @@ else
   export PKG_CONFIG_PATH="${NCURSES_PKGCONFIG_PATH}"
 fi
 
-exec make LLVM=1 \
+if [ -z "${MAC_LINUX_KDK_MAKE}" ]
+then
+  MAC_LINUX_KDK_MAKE="make"
+fi
+
+if [ -z "${MAC_LINUX_KDK_ADD_MAKEFLAGS}" ]
+then
+  MAC_LINUX_KDK_ADD_MAKEFLAGS=""
+fi
+
+MAC_LINUX_KDK_LLVM_ENABLE_FLAG="LLVM=1"
+if [ "${MAC_LINUX_KDK_DISABLE_LLVM}" = "1" ]
+then
+  MAC_LINUX_KDK_LLVM_ENABLE_FLAG=""
+fi
+
+# shellcheck disable=SC2086
+exec "${MAC_LINUX_KDK_MAKE}" ${MAC_LINUX_KDK_ADD_MAKEFLAGS} ${MAC_LINUX_KDK_LLVM_ENABLE_FLAG} \
   HOSTCFLAGS="-D_UUID_T -D__GETHOSTUUID_H -I${MAC_LINUX_KDK_PATH}/env/include -I${HOMEBREW_ROOT}/opt/openssl@1.1/include" \
   HOSTLDFLAGS="-L${HOMEBREW_ROOT}/opt/openssl@1.1/lib" \
   "${@}"
