@@ -17,7 +17,7 @@ then
 fi
 
 _get_gnu_bin() {
-  echo -n "$(find -L "${DF_HOMEBREW_ROOT}/opt" -maxdepth 3 -type d -name gnubin)" | tr '\n' ':'
+  echo -n "$(find -L "${HOMEBREW_ROOT}/opt" -maxdepth 3 -type d -name gnubin)" | tr '\n' ':'
 }
 
 GNU_BIN_PATH="$(_get_gnu_bin)"
@@ -46,6 +46,12 @@ MAC_LINUX_KDK_LLVM_ENABLE_FLAG="LLVM=1"
 if [ "${MAC_LINUX_KDK_DISABLE_LLVM}" = "1" ]
 then
   MAC_LINUX_KDK_LLVM_ENABLE_FLAG=""
+fi
+
+if [ "${MAC_LINUX_KDK_RUN_IN_ENV}" = "1" ]
+then
+  exec "${@}"
+  exit "${?}"
 fi
 
 # shellcheck disable=SC2086
