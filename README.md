@@ -1,13 +1,13 @@
 # macOS Linux Kernel Development Kit
 
-Build the (ARM/ARM64) Linux Kernel on any macOS host
+Build the (ARM/ARM64/i386) Linux Kernel on any macOS host
 
 ## Details
 
 The macOS Linux Kernel Development Kit includes some bits from glibc to successfully build host tools, which allows a full
 kernel compile on macOS with little effort.
 
-**NOTE**: This is still early, and while at the time of this writing, mainline for arm64 successfully builds on Apple Silicon and Intel,
+**NOTE**: This is still early, and while at the time of this writing, mainline for arm64 and i386 (not amd64) successfully builds on Apple Silicon and Intel,
 this can change as the kernel continues development. Updates are welcome if things break.
 
 ## Usage

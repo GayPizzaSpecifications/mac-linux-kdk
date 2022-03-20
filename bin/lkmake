@@ -16,20 +16,31 @@ then
   export MAC_LINUX_KDK_PATH="${HOMEBREW_ROOT}/opt/mac-linux-kdk/libexec"
 fi
 
-_get_gnu_bin() {
-  echo -n "$(find -L "${HOMEBREW_ROOT}/opt" -maxdepth 3 -type d -name gnubin)" | tr '\n' ':'
-}
-
-GNU_BIN_PATH="$(_get_gnu_bin)"
-
-export PATH="${HOMEBREW_ROOT}/opt/llvm/bin:${GNU_BIN_PATH}:${PATH}"
-
-NCURSES_PKGCONFIG_PATH="${HOMEBREW_ROOT}/opt/ncurses/lib/pkgconfig"
-if [ -n "${PKG_CONFIG_PATH}" ]
+MAC_LINUX_KDK_HOSTCFLAGS=""
+MAC_LINUX_KDK_HOSTLDFLAGS=""
+if [ -n "${HOMEBREW_ROOT}" ]
 then
-  export PKG_CONFIG_PATH="${NCURSES_PKGCONFIG_PATH}:${PKG_CONFIG_PATH}"
-else
-  export PKG_CONFIG_PATH="${NCURSES_PKGCONFIG_PATH}"
+  _get_gnu_bin() {
+    echo -n "$(find -L "${HOMEBREW_ROOT}/opt" -maxdepth 3 -type d -name gnubin)" | tr '\n' ':'
+  }
+
+  GNU_BIN_PATH="$(_get_gnu_bin)"
+
+  export PATH="${HOMEBREW_ROOT}/opt/llvm/bin:${GNU_BIN_PATH}:${PATH}"
+
+  NCURSES_PKGCONFIG_PATH="${HOMEBREW_ROOT}/opt/ncurses/lib/pkgconfig"
+  if [ -n "${PKG_CONFIG_PATH}" ]
+  then
+    export PKG_CONFIG_PATH="${NCURSES_PKGCONFIG_PATH}:${PKG_CONFIG_PATH}"
+  else
+    export PKG_CONFIG_PATH="${NCURSES_PKGCONFIG_PATH}"
+  fi
+
+  MAC_LINUX_KDK_HOSTCFLAGS="-I${HOMEBREW_ROOT}/opt/openssl@1.1/include"
+  MAC_LINUX_KDK_HOSTLDFLAGS="-L${HOMEBREW_ROOT}/opt/openssl@1.1/lib"
+elif [ -d "${HOME}/.nix-profile" ]
+then
+  echo "NIX"
 fi
 
 if [ -z "${MAC_LINUX_KDK_MAKE}" ]
@@ -56,6 +67,6 @@ fi
 
 # shellcheck disable=SC2086
 exec "${MAC_LINUX_KDK_MAKE}" ${MAC_LINUX_KDK_ADD_MAKEFLAGS} ${MAC_LINUX_KDK_LLVM_ENABLE_FLAG} \
-  HOSTCFLAGS="-D_UUID_T -D__GETHOSTUUID_H -I${MAC_LINUX_KDK_PATH}/env/include -I${HOMEBREW_ROOT}/opt/openssl@1.1/include" \
-  HOSTLDFLAGS="-L${HOMEBREW_ROOT}/opt/openssl@1.1/lib" \
+  HOSTCFLAGS="-D_UUID_T -D__GETHOSTUUID_H -I${MAC_LINUX_KDK_PATH}/env/include ${MAC_LINUX_KDK_HOSTCFLAGS}" \
+  HOSTLDFLAGS="${MAC_LINUX_KDK_HOSTLDFLAGS}" \
   "${@}"
