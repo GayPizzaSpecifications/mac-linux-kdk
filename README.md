@@ -13,6 +13,6 @@ this can change as the kernel continues development. Updates are welcome if thin
 ## Usage
 
 1. Install [Homebrew](https://brew.sh) for package management.
-2. Install mac-linux-kdk: `brew install spinlocklabs/mac-linux-kdk/mac-linux-kdk`
+2. Install mac-linux-kdk: `brew install mysticlgbt/made/mac-linux-kdk`
 3. Clone the Linux kernel source to a case-sensitive filesystem. (Use Disk Utility to add a case-sensitive volume)
 4. Use `lkmake` instead of `make` to build the Linux kernel.
